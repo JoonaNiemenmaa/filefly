@@ -1,5 +1,6 @@
 package com.fileflyclient;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -7,48 +8,65 @@ import java.net.UnknownHostException;
 
 public class ServerInterface {
     private static ServerInterface serverInterface = null;
-    final private int PORT;
-    final private String SERVER_IP;
+    final private int PORT = 52685;
+    final private String SERVER_IP = "localhost";
+
+    // Fields referring to server request types
     final private int SEND = 0;
     final private int REQUEST = 1;
     final private int LIST = 2;
-    private ServerInterface() {
-        this.PORT = Main.getPort();
-        this.SERVER_IP = Main.getServerIP();
-    }
+
+    private ServerInterface() {}
+
     public static ServerInterface getInstance() {
         if (serverInterface == null) {
             serverInterface = new ServerInterface();
         }
         return serverInterface;
     }
-    public void sendFile(String FILENAME, byte[] b) {
-        Socket socket = null;
-        DataOutputStream socketOutputStream = null;
+
+    public void sendFile(String filename, byte[] b) {
         try {
-            socket = new Socket(SERVER_IP, PORT);
-            socketOutputStream = new DataOutputStream(socket.getOutputStream());
+            Socket socket = new Socket(SERVER_IP, PORT);
+            DataOutputStream socketOutputStream = new DataOutputStream(socket.getOutputStream());
+
             socketOutputStream.writeInt(SEND);
-            socketOutputStream.writeInt(FILENAME.length());
-            socketOutputStream.write(FILENAME.getBytes());
+            socketOutputStream.writeInt(filename.length());
+            socketOutputStream.write(filename.getBytes());
             socketOutputStream.write(b);
             socketOutputStream.flush();
+
             socketOutputStream.close();
+            socket.close();
         } catch (UnknownHostException exception) {
             exception.printStackTrace();
         } catch (IOException exception) {
             exception.printStackTrace();
-        } finally {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-                if (socketOutputStream != null) {
-                    socketOutputStream.close();
-                }
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }           
         }   
+    }
+
+    public byte[] requestFile(String filename) {
+        byte[] file = null;
+        try {
+            Socket socket = new Socket(SERVER_IP, PORT);
+            DataOutputStream socketOutputStream = new DataOutputStream(socket.getOutputStream());
+
+            socketOutputStream.writeInt(REQUEST);
+            socketOutputStream.write(filename.getBytes());
+            socketOutputStream.flush();
+
+            DataInputStream socketInputStream = new DataInputStream(socket.getInputStream());
+
+            socketInputStream.readFully(file);
+
+            socketInputStream.close();
+            socketOutputStream.close();
+            socket.close();
+        } catch (UnknownHostException exception) {
+            exception.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return file;
     }
 }
