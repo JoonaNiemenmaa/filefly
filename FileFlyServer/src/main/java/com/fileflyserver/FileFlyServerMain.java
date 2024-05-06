@@ -1,49 +1,48 @@
 package com.fileflyserver;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class FileFlyServerMain {
 	final private static int PORT = 52685;
 	public static void main ( String[] args ) {
 		System.out.println("The server is online!");
 		while (true) {
-   		    try {
+   		    /*try {
 				ServerSocket serverSocket = new ServerSocket(PORT);
 				Socket socket = serverSocket.accept();
 				System.out.println("Connection established!");
-				DataInputStream clientInputStream = new DataInputStream(socket.getInputStream());
-				DataOutputStream clientOutputStream = new DataOutputStream(socket.getOutputStream()); 
-				int request = clientInputStream.readInt();    
+				ObjectInputStream clientInputStream = new ObjectInputStream(socket.getInputStream());
+				ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream()); 
+				//Data data = (Data) clientInputStream.readObject();
+				//System.out.println("Request type: " + data.getRequestType());
 				String filename;
-				byte[] file;
-				switch (request) {
-					case 0:
-						int filenameLength = clientInputStream.readInt();
-						byte[] FILENAME_BYTES = clientInputStream.readNBytes(filenameLength);
-					 	filename = new String(FILENAME_BYTES, StandardCharsets.UTF_8);
-						file = clientInputStream.readAllBytes();
+				byte[] filedata;
+				switch (data.getRequestType()) {
+					case 0: // SEND
+					 	filename = data.getFileName();
+						filedata = data.getFileData();
 						System.out.println("File " + filename + " received!");
-						System.out.write(file);
+						System.out.write(filedata);
 						System.out.flush();
 						System.out.println();
-						DataStorage.getInstance().storeFile(filename, file);
+						DataStorage.getInstance().storeFile(filename, filedata);
 						break;
-					case 1:
-						filename = new String(clientInputStream.readAllBytes(), StandardCharsets.UTF_8);
+					case 1: // REQUEST
+						filename = data.getFileName();
 						System.out.println("Request for file " + filename + "...");
-						file = DataStorage.getInstance().getFileByName(filename);
-						System.out.write(file);
+						filedata = DataStorage.getInstance().getFileByName(filename);
+						System.out.write(filedata);
 						System.out.flush();
 						System.out.println();
-						clientOutputStream.write(file);
+						Data responseData = new Data(3, filename, filedata);
+						clientOutputStream.writeObject(responseData);
 						clientOutputStream.flush();
 						break;
-					case 2:
+					case 2: // LIST
 
 						break;
 					default:
@@ -56,7 +55,10 @@ public class FileFlyServerMain {
 				serverSocket.close();
 			} catch (IOException exception) {
 				exception.printStackTrace();
-			}
+			} catch (ClassNotFoundException exception) {
+				exception.printStackTrace();
+			}*/
+			break;
 		}
 	}
 }

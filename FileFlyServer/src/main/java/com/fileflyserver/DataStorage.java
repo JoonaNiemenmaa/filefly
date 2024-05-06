@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 public class DataStorage {
@@ -21,23 +22,30 @@ public class DataStorage {
         return dataStorage;
     }
 
-    public ArrayList<String> getFileNames() { return files; }
+    public ArrayList<String> getFileNames() { 
+        loadFileNames();
+        return files; 
+    }
 
     public void saveFileNames() {
-        ObjectOutputStream objectWriter = null;
         try {
-            objectWriter = new ObjectOutputStream(new FileOutputStream(STORAGE_FILE_NAME + FILENAMESDATA_FILE_NAME));
+            ObjectOutputStream objectWriter = new ObjectOutputStream(new FileOutputStream(STORAGE_FILE_NAME + FILENAMESDATA_FILE_NAME));
             objectWriter.writeObject(files);
+            objectWriter.close();
         } catch (IOException exception) {
-            
-        } finally {
-            try {
-                if (objectWriter != null) {
-                    objectWriter.close();
-                }
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            } 
+            exception.printStackTrace();            
+        }
+    }
+
+    public void loadFileNames() {
+        try {
+            ObjectInputStream objectReader = new ObjectInputStream(new FileInputStream(STORAGE_FILE_NAME + FILENAMESDATA_FILE_NAME));
+            files = (ArrayList<String>) objectReader.readObject();
+            objectReader.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        } catch (ClassNotFoundException exception) {
+            exception.printStackTrace();
         }
     }
 
@@ -48,6 +56,7 @@ public class DataStorage {
             fileWriter.write(file);
             fileWriter.flush();
             fileWriter.close();
+            loadFileNames();
             files.add(FILENAME);
             saveFileNames();
         } catch (IOException exception) {

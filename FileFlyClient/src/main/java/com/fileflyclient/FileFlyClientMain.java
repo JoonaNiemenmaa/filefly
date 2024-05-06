@@ -1,14 +1,15 @@
 package com.fileflyclient;
 
 public class FileFlyClientMain {
-	// args[0] is the command type ("send", "request", "list") and args[1] is the input argument, usually the filename
+	// args[0] is the command type ("send", "request", "list")
+	// "send" and "request" commands take an argument for the file name to execute. The filename is read from args[1]
 	public static void main( String[] args ) {
-		String command = "request";
+		String command = "send";
 		String filename;
 		byte[] file;
 		switch (command) {
 			case "send":
-				filename = "test.txt";		
+				filename = "test.txt";
 				file = FileHandler.getInstance().readFile(filename);	
 				ServerInterface.getInstance().sendFile(filename, file);
 				break;
