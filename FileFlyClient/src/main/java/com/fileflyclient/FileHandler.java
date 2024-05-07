@@ -27,6 +27,7 @@ public class FileHandler {
 		}
         return null;
     }
+
 	public void writeFile(String filename, byte[] file) {
 		try {
 			FileOutputStream fileWriter = new FileOutputStream(filename);

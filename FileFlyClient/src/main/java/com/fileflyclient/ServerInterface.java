@@ -1,8 +1,7 @@
 package com.fileflyclient;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -10,10 +9,8 @@ public class ServerInterface {
     private static ServerInterface serverInterface = null;
     final private int PORT = 52685;
     final private String SERVER_IP = "localhost";
-
-    // Fields referring to server request types
     final private int SEND = 0;
-    final private int REQUEST = 1;
+    final private int ASK = 1;
     final private int LIST = 2;
 
     private ServerInterface() {}
@@ -25,13 +22,15 @@ public class ServerInterface {
         return serverInterface;
     }
 
-    public void sendFile(String filename, byte[] b) {
+    public void sendFile(String filename, byte[] filedata) {
         try {
             Socket socket = new Socket(SERVER_IP, PORT);
-            ObjectOutputStream socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            DataOutputStream socketOutputStream = new DataOutputStream(socket.getOutputStream());
 
-            //Data send = new Data(SEND, filename, b);
-            //socketOutputStream.writeObject(send);
+            socketOutputStream.writeInt(SEND);
+            socketOutputStream.writeInt(filename.length());
+            socketOutputStream.write(filename.getBytes());
+            socketOutputStream.write(filedata);
             socketOutputStream.flush();
 
             socketOutputStream.close();
@@ -43,33 +42,67 @@ public class ServerInterface {
         }   
     }
 
-    public byte[] requestFile(String filename) {
+    public byte[] askForFile(String filename) {
         byte[] file = null;
         try {
             Socket socket = new Socket(SERVER_IP, PORT);
-            ObjectOutputStream socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream socketInputStream = new ObjectInputStream(socket.getInputStream());
-            
-            //Data request = new Data(REQUEST, filename, null);
-            //socketOutputStream.writeObject(request);
+
+            DataOutputStream socketOutputStream = new DataOutputStream(socket.getOutputStream());
+            socketOutputStream.writeInt(ASK);
+            socketOutputStream.write(filename.getBytes());
             socketOutputStream.flush();
-
-            //Data data = (Data) socketInputStream.readObject();
-            //file = data.getFileData();
-
-            System.out.write(file);
-            System.out.flush();
-
-            socketInputStream.close();
             socketOutputStream.close();
+
             socket.close();
         } catch (UnknownHostException exception) {
             exception.printStackTrace();
         } catch (IOException exception) {
             exception.printStackTrace();
-        }/* catch (ClassNotFoundException exception) {
+        }
+        try {
+            Socket socket = new Socket(SERVER_IP, PORT);
+
+            DataInputStream socketInputStream = new DataInputStream(socket.getInputStream());
+            file = socketInputStream.readAllBytes();
+            socketInputStream.close();
+
+            System.out.write(file);
+            System.out.flush();
+
+            socket.close();
+        } catch (UnknownHostException exception) {
             exception.printStackTrace();
-        }*/
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
         return file;
     }
+	public ArrayList<String> requestList() {
+		ArrayList<String> files = null;
+		try {
+			Socket socket = new Socket(SERVER_IP, PORT);
+            DataOutputStream socketOutputStream = new DataOutputStream(socket.getOutputStream());
+            socketOutputStream.writeInt(LIST);
+            socketOutputStream.flush();
+			socket.close();
+		} catch (UnknownHostException exception) {
+			exception.printStackTrace();
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
+        try {
+            Socket socket = new Socket(SERVER_IP, PORT);
+            ObjectInputStream socketInputStream = new ObjectInputStream(socket.getInputStream());
+            files = (ArrayList<String>) socketInputStream.readObject();
+            socketInputStream.close();
+            socket.close();
+        } catch (UnknownHostException exception) {
+            exception.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        } catch (ClassNotFoundException exception) {
+            exception.printStackTrace();
+        }
+		return files;
+	}
 }

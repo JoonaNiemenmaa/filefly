@@ -1,64 +1,87 @@
 package com.fileflyserver;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class FileFlyServerMain {
 	final private static int PORT = 52685;
 	public static void main ( String[] args ) {
 		System.out.println("The server is online!");
 		while (true) {
-   		    /*try {
-				ServerSocket serverSocket = new ServerSocket(PORT);
-				Socket socket = serverSocket.accept();
+			ServerSocket serverSocket = null;
+			Socket socket = null;
+			DataInputStream socketDataInputStream = null;
+			DataOutputStream socketDataOutputStream = null;
+			ObjectOutputStream socketObjectOutputStream = null;
+   		    try {
+				serverSocket = new ServerSocket(PORT);
+				socket = serverSocket.accept();
 				System.out.println("Connection established!");
-				ObjectInputStream clientInputStream = new ObjectInputStream(socket.getInputStream());
-				ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream()); 
-				//Data data = (Data) clientInputStream.readObject();
-				//System.out.println("Request type: " + data.getRequestType());
+				socketDataInputStream = new DataInputStream(socket.getInputStream());
+				int request = socketDataInputStream.readInt();
 				String filename;
 				byte[] filedata;
-				switch (data.getRequestType()) {
+				switch (request) {
 					case 0: // SEND
-					 	filename = data.getFileName();
-						filedata = data.getFileData();
+						int filenameLength = socketDataInputStream.readInt();
+					 	filename = new String(socketDataInputStream.readNBytes(filenameLength), StandardCharsets.UTF_8);
+						filedata = socketDataInputStream.readAllBytes();
+						socketDataInputStream.close();
+
 						System.out.println("File " + filename + " received!");
 						System.out.write(filedata);
 						System.out.flush();
 						System.out.println();
-						DataStorage.getInstance().storeFile(filename, filedata);
+
+						FileStorage.getInstance().storeFile(filename, filedata);
 						break;
-					case 1: // REQUEST
-						filename = data.getFileName();
+					case 1: // ASK
+						filename = new String(socketDataInputStream.readAllBytes(), StandardCharsets.UTF_8);
+						socketDataInputStream.close();
+
 						System.out.println("Request for file " + filename + "...");
-						filedata = DataStorage.getInstance().getFileByName(filename);
+						filedata = FileStorage.getInstance().getFileByName(filename);
+
 						System.out.write(filedata);
 						System.out.flush();
 						System.out.println();
-						Data responseData = new Data(3, filename, filedata);
-						clientOutputStream.writeObject(responseData);
-						clientOutputStream.flush();
+
+						socket = serverSocket.accept();
+
+						socketDataOutputStream = new DataOutputStream(socket.getOutputStream());
+						socketDataOutputStream.write(filedata);
+						socketDataOutputStream.flush();
+						socketDataOutputStream.close();
 						break;
 					case 2: // LIST
+						socketDataInputStream.close();
 
+						socket = serverSocket.accept();
+
+						socketObjectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+						socketObjectOutputStream.writeObject(FileStorage.getInstance().getFileNames());
+						socketObjectOutputStream.flush();
+						socketObjectOutputStream.close();
 						break;
 					default:
 						System.out.println("Unknown request");
 						break;
 				}
-				clientInputStream.close();
-				clientOutputStream.close();
-				socket.close();
-				serverSocket.close();
 			} catch (IOException exception) {
 				exception.printStackTrace();
-			} catch (ClassNotFoundException exception) {
-				exception.printStackTrace();
-			}*/
-			break;
+			} finally {
+			   try {
+				   if (socketDataInputStream != null) { socketDataInputStream.close(); }
+				   if (socketDataOutputStream != null) { socketDataOutputStream.close(); }
+				   if (socketObjectOutputStream != null) { socketObjectOutputStream.close(); }
+				   if (socket != null) { socket.close(); }
+				   if (serverSocket != null) { serverSocket.close(); }
+			   } catch (IOException exception) {
+				   exception.printStackTrace();
+			   }
+		    }
 		}
 	}
 }

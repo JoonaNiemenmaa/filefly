@@ -1,25 +1,31 @@
 package com.fileflyclient;
 
+import java.util.ArrayList;
+
 public class FileFlyClientMain {
 	// args[0] is the command type ("send", "request", "list")
 	// "send" and "request" commands take an argument for the file name to execute. The filename is read from args[1]
 	public static void main( String[] args ) {
-		String command = "send";
+		String command = args[0];
 		String filename;
-		byte[] file;
+		byte[] filedata;
 		switch (command) {
 			case "send":
-				filename = "test.txt";
-				file = FileHandler.getInstance().readFile(filename);	
-				ServerInterface.getInstance().sendFile(filename, file);
+				filename = args[1];
+				filedata = FileHandler.getInstance().readFile(filename);
+				ServerInterface.getInstance().sendFile(filename, filedata);
 				break;
-			case "request":
-				filename = "test.txt";
-				file = ServerInterface.getInstance().requestFile(filename);
-				FileHandler.getInstance().writeFile(filename, file);
+			case "ask":
+				filename = args[1];
+				filedata = ServerInterface.getInstance().askForFile(filename);
+				FileHandler.getInstance().writeFile(filename, filedata);
 				break;
 			case "list":
-
+				ArrayList<String> files = ServerInterface.getInstance().requestList();
+				System.out.println("Retrieving files from file server...");
+				for (String file : files) {
+					System.out.println(file);
+				}
 				break;
 		
 			default:

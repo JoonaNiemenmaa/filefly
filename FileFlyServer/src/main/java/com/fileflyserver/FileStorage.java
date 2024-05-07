@@ -7,19 +7,19 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-public class DataStorage {
+public class FileStorage {
     private ArrayList<String> files = new ArrayList<>();
-    private static DataStorage dataStorage = null;
+    private static FileStorage fileStorage = null;
     final private String STORAGE_FILE_NAME = "storage/";
     final private String FILENAMESDATA_FILE_NAME = "files.data";
 
-    private DataStorage() {}
+    private FileStorage() {}
 
-    public static DataStorage getInstance() {
-        if (dataStorage == null) {
-            dataStorage = new DataStorage();
+    public static FileStorage getInstance() {
+        if (fileStorage == null) {
+            fileStorage = new FileStorage();
         }
-        return dataStorage;
+        return fileStorage;
     }
 
     public ArrayList<String> getFileNames() { 

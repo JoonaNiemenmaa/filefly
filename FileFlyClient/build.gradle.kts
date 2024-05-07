@@ -3,8 +3,5 @@ plugins {
 	id("java")
 }
 application {
-	mainClass = "com.fileflyclient.Main"
-}
-dependencies {
-	implementation project(":FileFlyRequestTypes")	
+	mainClass = "com.fileflyclient.FileFlyClientMain"
 }
