@@ -36,9 +36,13 @@ public class ServerInterface {
             socketOutputStream.close();
             socket.close();
         } catch (UnknownHostException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not connect to file server");
+            System.exit(0);
         } catch (IOException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not transfer file to server");
+            System.exit(0);
         }   
     }
 
@@ -55,9 +59,13 @@ public class ServerInterface {
 
             socket.close();
         } catch (UnknownHostException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not connect to file server");
+            System.exit(0);
         } catch (IOException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not request file from server");
+            System.exit(0);
         }
         try {
             Socket socket = new Socket(SERVER_IP, PORT);
@@ -71,9 +79,13 @@ public class ServerInterface {
 
             socket.close();
         } catch (UnknownHostException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not connect to file server");
+            System.exit(0);
         } catch (IOException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.out.println("Error: Could not retrieve file from server");
+            System.exit(0);
         }
         return file;
     }
@@ -86,9 +98,13 @@ public class ServerInterface {
             socketOutputStream.flush();
 			socket.close();
 		} catch (UnknownHostException exception) {
-			exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not connect to file server");
+            System.exit(0);
 		} catch (IOException exception) {
-			exception.printStackTrace();
+			// exception.printStackTrace();
+            System.out.println("Error: Could not request files from server");
+            System.exit(0);
 		}
         try {
             Socket socket = new Socket(SERVER_IP, PORT);
@@ -97,11 +113,17 @@ public class ServerInterface {
             socketInputStream.close();
             socket.close();
         } catch (UnknownHostException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not connect to file server");
+            System.exit(0);
         } catch (IOException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Could not receive file names from server");
+            System.exit(0);
         } catch (ClassNotFoundException exception) {
-            exception.printStackTrace();
+            // exception.printStackTrace();
+            System.err.println("Error: Casting received data to ArrayList failed");
+            System.exit(0);
         }
 		return files;
 	}

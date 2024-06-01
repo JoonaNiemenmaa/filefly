@@ -1,6 +1,7 @@
 package com.fileflyclient;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -22,8 +23,14 @@ public class FileHandler {
 			byte[] b = fileReader.readAllBytes();
 			fileReader.close();
             return b;
+		} catch (FileNotFoundException exception) {
+			// exception.printStackTrace();
+			System.err.println("Error: Specified file not found");
+			System.exit(0);
 		} catch (IOException exception) {
-			exception.printStackTrace();
+			// exception.printStackTrace();
+			System.err.println("Error: File could not be read");
+			System.exit(0);
 		}
         return null;
     }
@@ -35,7 +42,9 @@ public class FileHandler {
 			fileWriter.flush();
 			fileWriter.close();
 		} catch (IOException exception) {
-			exception.printStackTrace();
+			// exception.printStackTrace();
+			System.err.println("Error: File could not be written");
+			System.exit(0);
 		}
 	}
 

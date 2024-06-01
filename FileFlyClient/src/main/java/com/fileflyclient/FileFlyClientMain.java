@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class FileFlyClientMain {
 	// args[0] is the command type ("send", "request", "list")
-	// "send" and "request" commands take an argument for the file name to execute. The filename is read from args[1]
+	// "send" and "ask" commands take an argument for the file name to execute. The filename is read from args[1]
 	public static void main( String[] args ) {
 		String command = args[0];
 		String filename;
@@ -12,23 +12,27 @@ public class FileFlyClientMain {
 		switch (command) {
 			case "send":
 				filename = args[1];
+				System.out.println("Sending file '" + filename + "' to server...");
 				filedata = FileHandler.getInstance().readFile(filename);
 				ServerInterface.getInstance().sendFile(filename, filedata);
 				break;
 			case "ask":
 				filename = args[1];
+				System.out.println("Asking for file '" + filename + "' from server...");
 				filedata = ServerInterface.getInstance().askForFile(filename);
 				FileHandler.getInstance().writeFile(filename, filedata);
 				break;
 			case "list":
 				ArrayList<String> files = ServerInterface.getInstance().requestList();
-				System.out.println("Retrieving files from file server...");
+				System.out.println("Retrieving file names from file server...\n");
 				for (String file : files) {
 					System.out.println(file);
 				}
+				System.out.println("\nListed " + files.size() + " files");
 				break;
 		
 			default:
+				System.out.println("Unknown command");
 				break;
 		}	
 	}

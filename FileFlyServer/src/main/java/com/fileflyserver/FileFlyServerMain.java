@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 public class FileFlyServerMain {
 	final private static int PORT = 52685;
 	public static void main ( String[] args ) {
+		FileStorage.getInstance();
 		System.out.println("The server is online!");
 		while (true) {
 			ServerSocket serverSocket = null;
@@ -18,7 +19,7 @@ public class FileFlyServerMain {
    		    try {
 				serverSocket = new ServerSocket(PORT);
 				socket = serverSocket.accept();
-				System.out.println("Connection established!");
+				System.out.println("Connection established with the IP " + socket.getInetAddress());
 				socketDataInputStream = new DataInputStream(socket.getInputStream());
 				int request = socketDataInputStream.readInt();
 				String filename;
@@ -31,9 +32,6 @@ public class FileFlyServerMain {
 						socketDataInputStream.close();
 
 						System.out.println("File " + filename + " received!");
-						System.out.write(filedata);
-						System.out.flush();
-						System.out.println();
 
 						FileStorage.getInstance().storeFile(filename, filedata);
 						break;
@@ -44,10 +42,6 @@ public class FileFlyServerMain {
 						System.out.println("Request for file " + filename + "...");
 						filedata = FileStorage.getInstance().getFileByName(filename);
 
-						System.out.write(filedata);
-						System.out.flush();
-						System.out.println();
-
 						socket = serverSocket.accept();
 
 						socketDataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -57,6 +51,8 @@ public class FileFlyServerMain {
 						break;
 					case 2: // LIST
 						socketDataInputStream.close();
+
+						System.out.println("Request to return a list of filenames");
 
 						socket = serverSocket.accept();
 
@@ -70,7 +66,7 @@ public class FileFlyServerMain {
 						break;
 				}
 			} catch (IOException exception) {
-				exception.printStackTrace();
+				   exception.printStackTrace();
 			} finally {
 			   try {
 				   if (socketDataInputStream != null) { socketDataInputStream.close(); }
