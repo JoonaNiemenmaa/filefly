@@ -5,6 +5,6 @@ You use fileflyclient through the console to send files over to a fileflyserver 
 
 # Basic usage
 
-filefly list              Lists all files in remote file server
-filefly send 'filename'    Sends a specified file to the file server
-filefly ask 'filename'    Pulls a file from the file server
+Lists all files in remote file server - filefly list 
+Send a specified file to the file server - filefly send 'filename'
+Pull a file from the file server: filefly ask 'filename'
