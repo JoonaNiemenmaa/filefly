@@ -1,8 +1,8 @@
-## FileFly
+# FileFly
   
 Basic file server / client pair of programs. You use fileflyclient through the console to send files over to a fileflyserver process which stores them on disk.
   
-# Basic usage
+## Basic usage
 
 List all files in remote file server
 ```console
