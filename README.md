@@ -1,6 +1,12 @@
 # FileFly
   
-Basic file server / client pair of programs. You use fileflyclient through the console to send files over to a fileflyserver process which stores them on disk.
+Basic file server / client pair of programs. 
+  
+Once setup, the user can send / request files from the server which stores them on disk.
+  
+The user can also list all files currently stored by the server.
+
+This project was made to learn about socket programming and network protocols.
   
 ## Basic usage
 
